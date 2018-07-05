@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".zxspectrum.ZxSpectrumActivity2">
+
+    <ru.ilapin.androidresearch.zxspectrum.ZxSpectrumView2
+            android:id="@+id/zx_spectrum_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top" />
+
+    <TextView
+        android:id="@+id/ips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:textColor="#0f0"
+        tools:text="Instructions per second: 10000"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/interruptsPerSecond"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ips"
+        android:layout_alignParentLeft="true"
+        android:textColor="#0f0"
+        tools:text="Interrupts per second: 60"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/exceededInstructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/interruptsPerSecond"
+        android:layout_alignParentLeft="true"
+        android:textColor="#0f0"
+        tools:text="Exceeded instructions percent: 60"
+        tools:ignore="RtlHardcoded" />
+
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/zx_reset"
+        tools:ignore="RelativeOverlap,RtlHardcoded" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+
+        <ru.ilapin.common.android.widgets.PressReleaseButton
+            android:id="@+id/capsShiftButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zx_caps" />
+
+        <ru.ilapin.common.android.widgets.PressReleaseButton
+            android:id="@+id/symbolShiftButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zx_symbol" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ZXSpectrumAIDE</string>
+	
+	<string name="zx_instructions_per_second">IPS: %1$s</string>
+    <string name="zx_interrupts_per_second">Interrupts per second: %1$s</string>
+    <string name="zx_exceeded_instruction_percent">Exceeded instructions: %1$s</string>
+    <string name="zx_reset">Reset</string>
+    <string name="zx_caps">Caps</string>
+    <string name="zx_symbol">SYM</string>
 </resources>
