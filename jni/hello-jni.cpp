@@ -242,4 +242,13 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_onKeyReleased(JNIEnv *env, jobject
 	g_zxSpectrum->onKeyReleased(keyCode);
 }
 
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_stopZxSpectrum(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_zxSpectrum->quit();
+}
+
 }

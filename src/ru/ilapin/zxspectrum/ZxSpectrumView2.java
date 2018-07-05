@@ -16,7 +16,7 @@ public class ZxSpectrumView2 extends View {
 	public static final int SCREEN_HEIGHT = 192;
 
 	private static final float ASPECT_RATIO = (float) 4 / 3;
-	private static final int FLASH_DELAY = 781; // ms
+	private static final int FLASH_DELAY = 320; // ms
 
 	private BitmapDataProvider mBitmapDataProvider;
 	private VerticalRefreshListener mVerticalRefreshListener;

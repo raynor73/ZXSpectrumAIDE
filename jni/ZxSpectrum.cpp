@@ -88,6 +88,7 @@ void ZxSpectrum::quit() {
 }
 
 void ZxSpectrum::reset() {
+	m_cpu->reset();
 }
 
 void ZxSpectrum::verticalRefresh() {

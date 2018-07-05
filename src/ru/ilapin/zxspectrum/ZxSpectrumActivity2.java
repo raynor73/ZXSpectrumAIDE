@@ -227,7 +227,7 @@ public class ZxSpectrumActivity2 extends Activity {
         mScreenView.removeCallbacks(mUpdateStatsRoutine);
     }
 
-    /*@Override
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -239,7 +239,6 @@ public class ZxSpectrumActivity2 extends Activity {
         }
     }
 
-    */
 	@SuppressLint("StaticFieldLeak")
     private class LoadRomTask extends AsyncTask<String, Void, Void> {
 
@@ -280,7 +279,7 @@ public class ZxSpectrumActivity2 extends Activity {
 
     private native void initZxSpectrum(byte[] program, String logFilePath);
     private native void runZxSpectrum();
-    //private native void stopZxSpectrum();
+    private native void stopZxSpectrum();
     private native void resetZxSpectrum();
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
     private native void onVerticalRefresh();
