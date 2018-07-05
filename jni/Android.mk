@@ -26,6 +26,7 @@ ifeq ($(TARGET_ARCH_ABI),x86)
     LOCAL_CFLAGS += -ffast-math -mtune=atom -mssse3 -mfpmath=sse
 endif
 
-LOCAL_LDLIBS    := -llog
+LOCAL_LDLIBS    := -llog #-lOpenSLES
+#LOCAL_LDLIBS    += -lOpenSLES
 
 include $(BUILD_SHARED_LIBRARY)

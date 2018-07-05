@@ -19,6 +19,8 @@
 #include <cstring>
 #include <map>
 #include <jni.h>
+//#include <SLES/OpenSLES.h>
+//#include <SLES/OpenSLES_Android.h>
 #include "Z80Exerciser.h"
 #include "ZxSpectrum.h"
 
