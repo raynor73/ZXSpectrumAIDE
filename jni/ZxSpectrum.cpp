@@ -13,6 +13,9 @@ static uint8_t readFromMemory(void* userData, uint16_t address) {
 }
 
 static void writeToMemory(void* userData, uint16_t address, uint8_t data) {
+	if (address < 0x4000) {
+		return;
+	}
 	uint8_t* memory = static_cast<uint8_t *>(userData);
 	memory[address] = data;
 }

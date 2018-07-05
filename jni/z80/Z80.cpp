@@ -1392,6 +1392,13 @@ void Z80::doExecute() {
 			setRegA(doArithmetic(read8(m_PC), true, false));
 			m_PC += 1;
 			break;
+			
+		case 0xcf:
+			LOG_OPCODE("RST 0x08");
+			doPush(m_PC);
+			m_PC = 0x08;
+			m_tStates += 1;
+			break;
 
 		case 0xd0:
 			LOG_OPCODE("RET NC");
@@ -1452,7 +1459,7 @@ void Z80::doExecute() {
 		case 0xd7:
 			LOG_OPCODE("RST 0x10");
 			doPush(m_PC);
-			m_PC = 0x010;
+			m_PC = 0x10;
 			m_tStates += 1;
 			break;
 			
