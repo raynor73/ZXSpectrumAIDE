@@ -256,6 +256,14 @@ void Z80::doExecute() {
 			setRegA(doRLC(false, regA()));
 			break;
 
+		case 0x08: {
+			LOG_OPCODE("EX AF, AF'");
+			uint16_t tmp = m_AF;
+			m_AF = m_AFalt;
+			m_AFalt = tmp;
+			break;
+		}
+			
 		case 0x09:
 			LOG_OPCODE("ADD HL, BC");
 			m_HL = doAddWord(m_HL, m_BC, false, false);
@@ -1441,6 +1449,13 @@ void Z80::doExecute() {
 			m_PC += 1;
 			break;
 
+		case 0xd7:
+			LOG_OPCODE("RST 0x10");
+			doPush(m_PC);
+			m_PC = 0x010;
+			m_tStates += 1;
+			break;
+			
 		case 0xd8:
 			LOG_OPCODE("RET C");
 			if (isFlagSet(FLAG_C_MASK)) {
