@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <string>
+#include <ctime>
 #include "ZxSpectrum.h"
 
 static uint8_t readFromMemory(void* userData, uint16_t address) {
@@ -49,8 +50,8 @@ ZxSpectrum::~ZxSpectrum() {
 
 void ZxSpectrum::loop() {
 	while (m_isRunning) {
-		/*const uint64_t startTstates = m_memIoOps->tstates();
-		clock_gettime(CLOCK_MONOTONIC, &m_startTimestamp);*/
+		const uint64_t startTstates = m_cpu->tStates();
+		clock_gettime(CLOCK_MONOTONIC, &m_startTimestamp);
 
 		bool shouldInterrupt = m_shouldInterrupt > 0;
 		if (shouldInterrupt) {
@@ -62,7 +63,7 @@ void ZxSpectrum::loop() {
 
 		m_cpu->execute();
 
-		/*uint64_t currentTstates = m_memIoOps->tstates();
+		uint64_t currentTstates = m_cpu->tStates();
 		clock_gettime(CLOCK_MONOTONIC, &m_currentTimestamp);
 
 		uint64_t expectedTime = (currentTstates - startTstates) * CPU_CLOCK_PERIOD;
@@ -77,7 +78,7 @@ void ZxSpectrum::loop() {
 			m_exceededInstructionsCounter++;
 		}
 
-		m_totalInstructionsCounter++;*/
+		m_totalInstructionsCounter++;
 
 		m_instructionsCount++;
 	}
