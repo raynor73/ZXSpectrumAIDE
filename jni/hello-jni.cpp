@@ -17,7 +17,7 @@
 #include <android/log.h>
 #include <string>
 #include <cstring>
-#include <unordered_map>
+#include <map>
 #include <jni.h>
 #include "Z80Exerciser.h"
 #include "ZxSpectrum.h"
@@ -45,10 +45,17 @@ static const uint16_t INK_BITS_MASK = 0x07;
 static const uint16_t PAPER_BITS_MASK = 0x38;
 static const uint16_t BRIGHTNESS_BIT_MASK = 0x40;
 
-static std::unordered_map<int, uint32_t> g_colorMap;
-static std::unordered_map<int, uint32_t> g_brightColorMap;
+/*static std::map<int, uint32_t> g_colorMap;
+static std::map<int, uint32_t> g_brightColorMap;*/
+static uint32_t g_colorMap[8];
+static uint32_t g_brightColorMap[8];
 
 static void renderZxSpectrumScreen(const uint8_t* memory, uint32_t* bitmap, const bool isFlash) {
+	/*for (int y = 0; y < SCREEN_HEIGHT; y++) {
+		for (int x = 0; x < SCREEN_WIDTH; x++) {
+			bitmap[x + y * SCREEN_WIDTH] = isFlash ? 0xff00ff00 : 0xff008000;
+		}
+	}*/
 	for (int i = 0; i < MEMORY_SIZE; i++) {
 		const uint8_t videoByte = uint8_t(memory[BASE_ADDRESS + i]);
 		const uint16_t attributeColumn = uint16_t(i % NUMBER_OF_ATTRIBUTE_COLUMNS);
@@ -60,19 +67,20 @@ static void renderZxSpectrumScreen(const uint8_t* memory, uint32_t* bitmap, cons
 					BASE_ADDRESS + MEMORY_SIZE + attributeRow * NUMBER_OF_ATTRIBUTE_COLUMNS + attributeColumn;
 			const uint8_t attribute = uint8_t(memory[attributeAddress]);
 			uint32_t color;
-			const std::unordered_map<int, uint32_t> &colorMap =
-					(attribute & BRIGHTNESS_BIT_MASK) == 0 ? g_colorMap : g_brightColorMap;
+			/*const std::map<int, uint32_t> &colorMap =
+					(attribute & BRIGHTNESS_BIT_MASK) == 0 ? g_colorMap : g_brightColorMap;*/
+			const uint32_t* colorMap = (attribute & BRIGHTNESS_BIT_MASK) == 0 ? g_colorMap : g_brightColorMap;
 			if ((attribute & FLASH_BIT_MASK) == 0 || !isFlash) {
 				if (videoBit != 0) {
-					color = colorMap.at(attribute & INK_BITS_MASK);
+					color = colorMap[attribute & INK_BITS_MASK];
 				} else {
-					color = colorMap.at((attribute & PAPER_BITS_MASK) >> 3);
+					color = colorMap[(attribute & PAPER_BITS_MASK) >> 3];
 				}
 			} else {
 				if (videoBit != 0) {
-					color = colorMap.at((attribute & PAPER_BITS_MASK) >> 3);
+					color = colorMap[(attribute & PAPER_BITS_MASK) >> 3];
 				} else {
-					color = colorMap.at(attribute & INK_BITS_MASK);
+					color = colorMap[attribute & INK_BITS_MASK];
 				}
 			}
 			const uint16_t x = uint16_t((i & 0x1f) * BITS_IN_BYTE + j);
@@ -82,7 +90,7 @@ static void renderZxSpectrumScreen(const uint8_t* memory, uint32_t* bitmap, cons
 }
 
 jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
-	g_colorMap.insert({0, 0xff000000});
+	/*g_colorMap.insert({0, 0xff000000});
 	g_colorMap.insert({1, 0xff0000d7});
 	g_colorMap.insert({2, 0xffd70000});
 	g_colorMap.insert({3, 0xffd700d7});
@@ -98,8 +106,26 @@ jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
 	g_brightColorMap.insert({4, 0xff00ff00});
 	g_brightColorMap.insert({5, 0xff00ffff});
 	g_brightColorMap.insert({6, 0xffffff00});
-	g_brightColorMap.insert({7, 0xffffffff});
+	g_brightColorMap.insert({7, 0xffffffff});*/
+	
+	g_colorMap[0] = 0xff000000;
+	g_colorMap[1] = 0xff0000d7;
+	g_colorMap[2] = 0xffd70000;
+	g_colorMap[3] = 0xffd700d7;
+	g_colorMap[4] = 0xff00d700;
+	g_colorMap[5] = 0xff00d7d7;
+	g_colorMap[6] = 0xffd7d700;
+	g_colorMap[7] = 0xffd7d7d7;
 
+	g_brightColorMap[0] = 0xff000000;
+	g_brightColorMap[1] = 0xff0000ff;
+	g_brightColorMap[2] = 0xffff0000;
+	g_brightColorMap[3] = 0xffff00ff;
+	g_brightColorMap[4] = 0xff00ff00;
+	g_brightColorMap[5] = 0xff00ffff;
+	g_brightColorMap[6] = 0xffffff00;
+	g_brightColorMap[7] = 0xffffffff;
+	
 	return JNI_VERSION_1_6;
 }
 	

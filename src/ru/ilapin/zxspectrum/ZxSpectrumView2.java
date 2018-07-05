@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.*;
+import android.os.*;
 
 public class ZxSpectrumView2 extends View {
 
@@ -82,14 +84,14 @@ public class ZxSpectrumView2 extends View {
 		setMeasuredDimension(width, height);
 	}
 
-	/*private long mTimestamp = -1;
+	private long mTimestamp = -1;
 	private long mFpsTimestamp = -1;
-	private float mFps = -1;*/
+	private float mFps = -1;
 
 	@SuppressLint("NewApi")
 	@Override
 	protected void onDraw(final Canvas canvas) {
-		/*final long currentTimestamp = SystemClock.elapsedRealtimeNanos();
+		final long currentTimestamp = SystemClock.elapsedRealtimeNanos();
 		if (mTimestamp >= 0) {
 			mFps = 1e9f / (currentTimestamp - mTimestamp);
 		}
@@ -100,7 +102,7 @@ public class ZxSpectrumView2 extends View {
 		} else if (currentTimestamp - mFpsTimestamp >= 1e9f) {
 			Log.d("!@#", "FPS: " + mFps);
 			mFpsTimestamp = currentTimestamp;
-		}*/
+		}
 
 		if (mBitmapDataProvider != null) {
 			mBitmap.setPixels(
@@ -110,9 +112,9 @@ public class ZxSpectrumView2 extends View {
 		mDstRect.set(0, 0, getWidth(), getHeight());
 		canvas.drawBitmap(mBitmap, mSrcRect, mDstRect, mPaint);
 
-		if (mVerticalRefreshListener != null) {
+		/*if (mVerticalRefreshListener != null) {
 			mVerticalRefreshListener.onVerticalRefresh();
-		}
+		}*/
 
 		invalidate();
 	}
