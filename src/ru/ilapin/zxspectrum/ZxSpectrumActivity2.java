@@ -117,7 +117,7 @@ public class ZxSpectrumActivity2 extends Activity {
 			}
 		});
 		
-        /*mCapsShiftButton.setListener(new PressReleaseButton.Listener() {
+        mCapsShiftButton.setListener(new PressReleaseButton.Listener() {
 
             @Override
             public void onPress() {
@@ -140,7 +140,7 @@ public class ZxSpectrumActivity2 extends Activity {
             public void onRelease() {
                 onKeyReleased(Keyboard.KEY_CODE_SYMBOL);
             }
-        });*/
+        });
 
 		findViewById(R.id.resetButton).setOnClickListener(new View.OnClickListener() {
 

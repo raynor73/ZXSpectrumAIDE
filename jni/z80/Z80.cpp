@@ -1489,6 +1489,14 @@ void Z80::doExecute() {
 			}
 			break;
 
+		case 0xdb: {
+			LOG_OPCODE("IN A, (n)");
+			uint8_t port = read8(m_PC);
+			setRegA(ioRead(regA() << 8 | port));
+			m_PC += 1;
+			break;
+		}
+			
 		case 0xdc: {
 			LOG_OPCODE("CALL C, nn");
 			if (isFlagSet(FLAG_C_MASK)) {
