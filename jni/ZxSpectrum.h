@@ -8,7 +8,7 @@
 
 #include <atomic>
 #include <ctime>
-#include <zx_spectrum/z80/Z80.h>
+#include "z80/Z80.h"
 #include "Keyboard.h"
 
 class ZxSpectrum {

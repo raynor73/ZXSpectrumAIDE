@@ -294,6 +294,21 @@ void Z80::doExecute() {
 			setRegA(doRRC(false, regA()));
 			break;
 
+		case 0x10: {
+			LOG_OPCODE("DJNZ");
+			int8_t offset = read8(m_PC);
+			m_PC++;
+			setRegB(regB() - 1);
+			if (regB() != 0) {
+				m_tStates += 5;
+				int32_t address = m_PC;
+				address += offset;
+				m_PC = address;
+			}
+			m_tStates += 1;
+			break;
+		}
+			
 		case 0x11:
 			LOG_OPCODE("LD DE, nn");
 			m_DE = read16(m_PC);
@@ -332,6 +347,17 @@ void Z80::doExecute() {
 			setRegA(doRL(false, regA()));
 			break;
 
+		case 0x18: {
+			LOG_OPCODE("JR n");
+			int8_t offset = read8(m_PC);
+			m_PC += 1;
+			int32_t address = m_PC;
+			address += offset;
+			m_PC = address;
+			m_tStates += 5;
+			break;
+		}
+			
 		case 0x19:
 			LOG_OPCODE("ADD HL, DE");
 			m_HL = doAddWord(m_HL, m_DE, false, false);
@@ -543,6 +569,21 @@ void Z80::doExecute() {
 			adjustFlags(regA());
 			break;
 
+		case 0x38: {
+			LOG_OPCODE("JR C, e");
+			if (isFlagSet(FLAG_C_MASK)) {
+				int8_t offset = read8(m_PC);
+				m_PC += 1;
+				int32_t pc32 = m_PC;
+				pc32 += offset;
+				m_PC = pc32;
+				m_tStates += 5;
+			} else {
+				m_PC += 1;
+			}
+			break;
+		}
+			
 		case 0x39:
 			LOG_OPCODE("ADD HL, SP");
 			m_HL = doAddWord(m_HL, m_SP, false, false);

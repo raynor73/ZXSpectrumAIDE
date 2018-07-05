@@ -17,6 +17,8 @@ import java.util.Map;
 import ru.ilapin.zxspectrum.R;
 import ru.ilapin.common.android.widgets.PressReleaseButton;
 import android.app.*;
+import android.view.View.*;
+import android.view.*;
 
 public class ZxSpectrumActivity2 extends Activity {
 
@@ -66,20 +68,14 @@ public class ZxSpectrumActivity2 extends Activity {
     }};
 
     static {
-        System.loadLibrary("zx-spectrum-emulator");
+        System.loadLibrary("hello-jni");
     }
 
-    //@BindView(R.id.zx_spectrum_screen)
     ZxSpectrumView2 mScreenView;
-    //@BindView(R.id.ips)
     TextView mInstructionsPerSecondView;
-    //@BindView(R.id.interruptsPerSecond)
     TextView mInterruptsPerSecondView;
-    //@BindView(R.id.exceededInstructions)
     TextView mExceededInstructionsView;
-    //@BindView(R.id.capsShiftButton)
     PressReleaseButton mCapsShiftButton;
-    //@BindView(R.id.symbolShiftButton)
     PressReleaseButton mSymbolShiftButton;
 
     private final int[] mScreenData = new int[ZxSpectrumView2.SCREEN_WIDTH * ZxSpectrumView2.SCREEN_HEIGHT * 4];
@@ -92,6 +88,13 @@ public class ZxSpectrumActivity2 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zx_spectrum2);
 
+		mScreenView = findViewById(R.id.zx_spectrum_screen);
+		mInstructionsPerSecondView = findViewById(R.id.ips);
+		mInterruptsPerSecondView = findViewById(R.id.interruptsPerSecond);
+		mExceededInstructionsView = findViewById(R.id.exceededInstructions);
+		mCapsShiftButton = findViewById(R.id.capsShiftButton);
+		mSymbolShiftButton = findViewById(R.id.symbolShiftButton);
+		
 		mScreenView.setBitmapDataProvider(new ZxSpectrumView2.BitmapDataProvider() {
 
 				@Override
@@ -106,7 +109,7 @@ public class ZxSpectrumActivity2 extends Activity {
                 "z80_1000cpp.log"
         );
 
-        mCapsShiftButton.setListener(new PressReleaseButton.Listener() {
+        /*mCapsShiftButton.setListener(new PressReleaseButton.Listener() {
 
             @Override
             public void onPress() {
@@ -131,46 +134,58 @@ public class ZxSpectrumActivity2 extends Activity {
             }
         });
 
+		findViewById(R.id.resetButton).setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View p1) {
+				resetZxSpectrum();
+			}
+		});*/
+		
         new LoadRomTask().execute("48.rom", logFile.getAbsolutePath());
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
 
-        mUpdateStatsRoutine = () -> {
-            final float instructionsPerSecond = getInstructionsCount();
-            if (instructionsPerSecond > 0) {
-                mInstructionsPerSecondView.setText(
+		mUpdateStatsRoutine = new Runnable() {
+
+			@Override
+			public void run() {
+				final float instructionsPerSecond = getInstructionsCount();
+				if (instructionsPerSecond > 0) {
+					mInstructionsPerSecondView.setText(
                         getString(R.string.zx_instructions_per_second, String.valueOf(instructionsPerSecond)));
-            } else {
-                mInstructionsPerSecondView.setText(
+				} else {
+					mInstructionsPerSecondView.setText(
                         getString(R.string.zx_instructions_per_second, getString(R.string.not_available)));
-            }
+				}
 
-            final float interruptsPerSecond = getInterruptCount();
-            if (interruptsPerSecond > 0) {
-                mInterruptsPerSecondView.setText(
+				final float interruptsPerSecond = getInterruptCount();
+				if (interruptsPerSecond > 0) {
+					mInterruptsPerSecondView.setText(
                         getString(R.string.zx_interrupts_per_second, String.valueOf(interruptsPerSecond)));
-            } else {
-                mInterruptsPerSecondView.setText(
+				} else {
+					mInterruptsPerSecondView.setText(
                         getString(R.string.zx_interrupts_per_second, getString(R.string.not_available))
-                );
-            }
+					);
+				}
 
-            final float exceededInstructions = getExceededInstructionsPercent();
-            if (exceededInstructions > 0) {
-                mExceededInstructionsView.setText(
+				final float exceededInstructions = getExceededInstructionsPercent();
+				if (exceededInstructions > 0) {
+					mExceededInstructionsView.setText(
                         getString(R.string.zx_exceeded_instruction_percent, String.valueOf(exceededInstructions)));
-            } else {
-                mExceededInstructionsView.setText(
+				} else {
+					mExceededInstructionsView.setText(
                         getString(R.string.zx_exceeded_instruction_percent, getString(R.string.not_available))
-                );
-            }
+					);
+				}
 
-            mScreenView.postDelayed(mUpdateStatsRoutine, 1000);
-        };
-        mScreenView.postDelayed(mUpdateStatsRoutine, 1000);
+				mScreenView.postDelayed(mUpdateStatsRoutine, 1000);
+			}
+		};
+		mScreenView.postDelayed(mUpdateStatsRoutine, 1000);
     }
 
     @Override
@@ -185,7 +200,13 @@ public class ZxSpectrumActivity2 extends Activity {
     @Override
     public boolean onKeyUp(final int keyCode, final KeyEvent event) {
         if (mKeyCodesMap.containsKey(keyCode)) {
-            mScreenView.postDelayed(() -> onKeyReleased(mKeyCodesMap.get(keyCode)), 250);
+			mScreenView.postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					onKeyReleased(mKeyCodesMap.get(keyCode));
+				}
+			}, 250);
         }
 
         return super.onKeyUp(keyCode, event);
@@ -210,12 +231,8 @@ public class ZxSpectrumActivity2 extends Activity {
         }
     }
 
-    @OnClick(R.id.resetButton)
-    public void onResetButtonClick() {
-        resetZxSpectrum();
-    }
-
-    @SuppressLint("StaticFieldLeak")
+    */
+	@SuppressLint("StaticFieldLeak")
     private class LoadRomTask extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -239,26 +256,30 @@ public class ZxSpectrumActivity2 extends Activity {
 
         @Override
         protected void onPostExecute(final Void aVoid) {
-            mZxSpectrumThread = new Thread(ZxSpectrumActivity2.this::runZxSpectrum);
-            mZxSpectrumThread.start();
+			mZxSpectrumThread = new Thread(new Runnable() {
 
-            mScreenView.setVerticalRefreshListener(ZxSpectrumActivity2.this::onVerticalRefresh);
-        }
+				@Override
+				public void run() {
+					ZxSpectrumActivity2.this.runZxSpectrum();
+				}
+			});
+            mZxSpectrumThread.start();
+		}
     }
 
-    private native void nativeGetScreenData(final byte[] memory, final int[] outData, boolean isFlash);
-    private native void runNativeThread();
+    /*private native void nativeGetScreenData(final byte[] memory, final int[] outData, boolean isFlash);
+    private native void runNativeThread();*/
 
     private native void initZxSpectrum(byte[] program, String logFilePath);
     private native void runZxSpectrum();
-    private native void stopZxSpectrum();
-    private native void resetZxSpectrum();
+    /*private native void stopZxSpectrum();
+    private native void resetZxSpectrum();*/
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
-    private native void onVerticalRefresh();
+    /*private native void onVerticalRefresh();
     private native void onKeyPressed(int keyCode);
     private native void onKeyReleased(int keyCode);
     private native void writeToPort(int port, byte value);
     private native float getExceededInstructionsPercent();
     private native int getInterruptCount();
-    private native int getInstructionsCount();
+    private native int getInstructionsCount();*/
 }

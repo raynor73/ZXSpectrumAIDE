@@ -5,9 +5,9 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".zxspectrum.ZxSpectrumActivity2">
+    tools:context=".ZxSpectrumActivity2">
 
-    <ru.ilapin.androidresearch.zxspectrum.ZxSpectrumView2
+    <ru.ilapin.zxspectrum.ZxSpectrumView2
             android:id="@+id/zx_spectrum_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
