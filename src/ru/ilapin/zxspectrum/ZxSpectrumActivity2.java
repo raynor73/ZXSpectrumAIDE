@@ -109,6 +109,14 @@ public class ZxSpectrumActivity2 extends Activity {
                 "z80_1000cpp.log"
         );
 
+		mScreenView.setVerticalRefreshListener(new ZxSpectrumView2.VerticalRefreshListener() {
+
+			@Override
+			public void onVerticalRefresh() {
+				ZxSpectrumActivity2.this.onVerticalRefresh();
+			}
+		});
+		
         /*mCapsShiftButton.setListener(new PressReleaseButton.Listener() {
 
             @Override
@@ -132,7 +140,7 @@ public class ZxSpectrumActivity2 extends Activity {
             public void onRelease() {
                 onKeyReleased(Keyboard.KEY_CODE_SYMBOL);
             }
-        });
+        });*/
 
 		findViewById(R.id.resetButton).setOnClickListener(new View.OnClickListener() {
 
@@ -140,12 +148,12 @@ public class ZxSpectrumActivity2 extends Activity {
 			public void onClick(View p1) {
 				resetZxSpectrum();
 			}
-		});*/
+		});
 		
         new LoadRomTask().execute("48.rom", logFile.getAbsolutePath());
     }
 
-    /*@Override
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -219,7 +227,7 @@ public class ZxSpectrumActivity2 extends Activity {
         mScreenView.removeCallbacks(mUpdateStatsRoutine);
     }
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -272,14 +280,14 @@ public class ZxSpectrumActivity2 extends Activity {
 
     private native void initZxSpectrum(byte[] program, String logFilePath);
     private native void runZxSpectrum();
-    /*private native void stopZxSpectrum();
-    private native void resetZxSpectrum();*/
+    //private native void stopZxSpectrum();
+    private native void resetZxSpectrum();
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
-    /*private native void onVerticalRefresh();
+    private native void onVerticalRefresh();
     private native void onKeyPressed(int keyCode);
     private native void onKeyReleased(int keyCode);
-    private native void writeToPort(int port, byte value);
+    //private native void writeToPort(int port, byte value);
     private native float getExceededInstructionsPercent();
     private native int getInterruptCount();
-    private native int getInstructionsCount();*/
+    private native int getInstructionsCount();
 }

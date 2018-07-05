@@ -177,4 +177,69 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_runZxSpectrum(JNIEnv *env, jobject
 	}
 }
 
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_resetZxSpectrum(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_zxSpectrum->reset();
+}
+
+JNIEXPORT jfloat JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getExceededInstructionsPercent(JNIEnv *env,
+																							 jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return 0;
+	}
+
+	return g_zxSpectrum->exceededInstructionsPercent();
+}
+
+JNIEXPORT jint JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getInterruptCount(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return 0;
+	}
+
+	return g_zxSpectrum->interruptsCount();
+}
+
+JNIEXPORT jint JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getInstructionsCount(JNIEnv *env,
+																				   jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return 0;
+	}
+
+	return g_zxSpectrum->instructionsCount();
+}
+
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_onVerticalRefresh(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_zxSpectrum->verticalRefresh();
+}
+
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_onKeyPressed(JNIEnv *env, jobject instance, jint keyCode) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_zxSpectrum->onKeyPressed(keyCode);
+}
+
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_onKeyReleased(JNIEnv *env, jobject instance, jint keyCode) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_zxSpectrum->onKeyReleased(keyCode);
+}
+
 }

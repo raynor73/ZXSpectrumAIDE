@@ -1509,6 +1509,13 @@ void Z80::doExecute() {
 			m_PC += 1;
 			break;
 
+		case 0xdf:
+			LOG_OPCODE("RST 0x18");
+			doPush(m_PC);
+			m_PC = 0x018;
+			m_tStates += 1;
+			break;
+			
 		case 0xe0:
 			LOG_OPCODE("RET NP");
 			if (!isFlagSet(FLAG_PV_MASK)) {
@@ -1566,6 +1573,13 @@ void Z80::doExecute() {
 			m_PC += 1;
 			break;
 
+		case 0xe7:
+			LOG_OPCODE("RST 0x20");
+			doPush(m_PC);
+			m_PC = 0x020;
+			m_tStates += 1;
+			break;
+			
 		case 0xe8:
 			LOG_OPCODE("RET P");
 			if (isFlagSet(FLAG_PV_MASK)) {
@@ -1620,6 +1634,13 @@ void Z80::doExecute() {
 			m_PC += 1;
 			break;
 
+		case 0xef:
+			LOG_OPCODE("RST 0x28");
+			doPush(m_PC);
+			m_PC = 0x028;
+			m_tStates += 1;
+			break;
+			
 		case 0xdd:
 			m_IX = doExecutionDDFD(m_IX, true);
 			break;
@@ -3204,7 +3225,21 @@ void Z80::doExecuteED() {
 			m_HL = doAddWord(m_HL, m_SP, true, true);
 			m_tStates += 7;
 			break;
+			
+		case 0x73:
+			LOG_OPCODE("LD (nn), SP");
+			write16(read16(m_PC), m_SP);
+			m_PC += 2;
+			break;
 
+		case 0x78:
+			LOG_OPCODE("IN A, (C)");
+			setRegA(ioRead(m_BC));
+			setFlag(FLAG_H_MASK | FLAG_N_MASK, false);
+			adjustFlagSZP(regA());
+			adjustFlags(regA());
+			break;
+			
 		case 0x7a:
 			LOG_OPCODE("ADC HL, SP");
 			m_HL = doAddWord(m_HL, m_SP, true, false);
@@ -3214,12 +3249,6 @@ void Z80::doExecuteED() {
 		case 0x7b:
 			LOG_OPCODE("LD SP, (nn)");
 			m_SP = read16(read16(m_PC));
-			m_PC += 2;
-			break;
-
-		case 0x73:
-			LOG_OPCODE("LD (nn), SP");
-			write16(read16(m_PC), m_SP);
 			m_PC += 2;
 			break;
 
@@ -3979,11 +4008,16 @@ uint16_t Z80::doExecutionDDFD(uint16_t regValue, bool isIX) {
 			m_tStates += 1;
 			break;
 
+		case 0xe9:
+			LOG_OPCODE(isIX ? "JP (IX)" : "JP (IY)");
+			m_PC = regValue;
+			break;
+			
 		case 0xed:
 			LOG_OPCODE("ED NOP");
 			break;
 
-		case 0xF9:
+		case 0xf9:
 			LOG_OPCODE(isIX ? "LD SP, IX" : "LD SP, IY");
 			m_SP = regValue;
 			m_tStates += 2;
