@@ -293,6 +293,7 @@ public class ZxSpectrumActivity2 extends Activity {
 					ZxSpectrumActivity2.this.runSound();
 				}
 			});
+			mSoundThread.setPriority(Thread.MAX_PRIORITY);
             mSoundThread.start();
 			
 			mAudioTrackThread = new Thread(new Runnable() {
@@ -335,6 +336,7 @@ public class ZxSpectrumActivity2 extends Activity {
 					mAudioTrack.stop();
 				}
 			});
+			mAudioTrackThread.setPriority(Thread.MAX_PRIORITY);
             mAudioTrackThread.start();
 		}
     }
