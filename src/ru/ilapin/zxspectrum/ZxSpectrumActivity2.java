@@ -298,8 +298,8 @@ public class ZxSpectrumActivity2 extends Activity {
 			mAudioTrackThread = new Thread(new Runnable() {
 				
 				private final AudioTrack mAudioTrack;
-				private final short[] mSurrogateBuffer = new short[mBufferSize];
-				private short mLastSample;
+				/*private final short[] mSurrogateBuffer = new short[mBufferSize];
+				private short mLastSample;*/
 					
 				{
 					mAudioTrack = new AudioTrack(
@@ -317,12 +317,17 @@ public class ZxSpectrumActivity2 extends Activity {
 				public void run() {
 					while (!mAudioTrackThread.isInterrupted()) {
 						short[] data;
-						data = mSoundDataQueue.poll();
+						/*data = mSoundDataQueue.poll();
 						if (data == null) {
 							data = mSurrogateBuffer;
 							Arrays.fill(data, mLastSample);
 						} else {
 							mLastSample = data[data.length - 1];
+						}*/
+						try {
+							data = mSoundDataQueue.take();
+						} catch (InterruptedException e) {
+							throw new RuntimeException(e);
 						}
 						mAudioTrack.write(data, 0, data.length);
 					}
