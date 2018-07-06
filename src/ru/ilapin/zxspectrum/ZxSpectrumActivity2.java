@@ -117,6 +117,11 @@ public class ZxSpectrumActivity2 extends Activity {
 					getZxSpectrumScreen(mScreenData, isFlash);
 					return mScreenData;
 				}
+				
+				@Override
+				public int getBorder() {
+					return getZxSpectrumScreenBorder();
+				}
 		});
         
         final File logFile = new File(
@@ -374,6 +379,7 @@ public class ZxSpectrumActivity2 extends Activity {
     private native void resetZxSpectrum();
 	private native void runSound();
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
+	private native int getZxSpectrumScreenBorder();
     private native void onVerticalRefresh();
     private native void onKeyPressed(int keyCode);
     private native void onKeyReleased(int keyCode);

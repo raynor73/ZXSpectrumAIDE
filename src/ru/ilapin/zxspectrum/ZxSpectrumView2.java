@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.util.*;
 import android.os.*;
+import android.graphics.*;
 
 public class ZxSpectrumView2 extends View {
 
@@ -19,7 +20,8 @@ public class ZxSpectrumView2 extends View {
 
 	private static final float ASPECT_RATIO = (float) 4 / 3;
 	private static final int FLASH_DELAY = 320; // ms
-
+	private static final int BORDER_PERCENT = 5;
+	
 	private BitmapDataProvider mBitmapDataProvider;
 	private VerticalRefreshListener mVerticalRefreshListener;
 	private final Bitmap mBitmap;
@@ -84,9 +86,9 @@ public class ZxSpectrumView2 extends View {
 		setMeasuredDimension(width, height);
 	}
 
-	private long mTimestamp = -1;
+	/*private long mTimestamp = -1;
 	private long mFpsTimestamp = -1;
-	private float mFps = -1;
+	private float mFps = -1;*/
 
 	@SuppressLint("NewApi")
 	@Override
@@ -104,12 +106,30 @@ public class ZxSpectrumView2 extends View {
 			mFpsTimestamp = currentTimestamp;
 		}*/
 
+		int border = 0xff000000;
 		if (mBitmapDataProvider != null) {
 			mBitmap.setPixels(
 					mBitmapDataProvider.getData(mIsFlash), 0, SCREEN_WIDTH, 0, 0,SCREEN_WIDTH, SCREEN_HEIGHT);
+			border = mBitmapDataProvider.getBorder();
 		}
 
-		mDstRect.set(0, 0, getWidth(), getHeight());
+		int width = getWidth();
+		int height = getHeight();
+		float borderWidth = BORDER_PERCENT / 200.0f * width;
+		float borderHeight = BORDER_PERCENT / 200.0f * height;
+		mDstRect.set(
+			(int) borderWidth, 
+			(int) borderHeight, 
+			(int) (width - borderWidth),
+			(int) (height - borderHeight)
+		);
+		
+		canvas.drawARGB(
+			Color.alpha(border), 
+			Color.red(border), 
+			Color.green(border), 
+			Color.blue(border)
+		);
 		canvas.drawBitmap(mBitmap, mSrcRect, mDstRect, mPaint);
 
 		if (mVerticalRefreshListener != null) {
@@ -130,6 +150,8 @@ public class ZxSpectrumView2 extends View {
 	public interface BitmapDataProvider {
 
 		int[] getData(boolean isFlash);
+		
+		int getBorder();
 	}
 
 	public interface VerticalRefreshListener {

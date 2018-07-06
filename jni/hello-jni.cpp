@@ -207,6 +207,15 @@ JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getZxSpectr
 	env->ReleaseIntArrayElements(outData_, outData, 0);
 }
 
+JNIEXPORT jint JNICALL 
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getZxSpectrumScreenBorder(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return 0xff000000;
+	}
+
+	return g_colorMap[g_zxSpectrum->portsArray()[0xfe] & 0x07];
+}
+
 JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpectrum(JNIEnv *env, jobject instance, jbyteArray program_, jint sampleRate, jint bufferSize, jobject queue, jstring logFilePath_) {
 	g_soundDataQueue = env->NewGlobalRef(queue);
 	jclass queueClass = env->GetObjectClass(g_soundDataQueue);
