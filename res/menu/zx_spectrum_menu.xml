@@ -8,5 +8,13 @@
 	<item
         android:id="@+id/toggle_stats_item"
         android:title="@string/toggle_stats"/>
+	
+	<item
+        android:id="@+id/start_item"
+        android:title="@string/start"/>
+	
+	<item
+        android:id="@+id/stop_item"
+        android:title="@string/stop"/>
     
 </menu>

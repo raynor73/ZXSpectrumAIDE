@@ -171,6 +171,16 @@ public class ZxSpectrumActivity2 extends Activity {
 		inflater.inflate(R.menu.zx_spectrum_menu, menu);
 		return true;
 	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean zxSpectrumIsRunning = mZxSpectrumThread != null && mZxSpectrumThread.isAlive();
+		
+		menu.findItem(R.id.start_item).setVisible(!zxSpectrumIsRunning);
+		menu.findItem(R.id.stop_item).setVisible(zxSpectrumIsRunning);
+		
+		return true;
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -182,6 +192,14 @@ public class ZxSpectrumActivity2 extends Activity {
 			case R.id.toggle_stats_item:
 				mShouldShowStats = !mShouldShowStats;
 				updateStatsVisibility();
+				return true;
+				
+			case R.id.start_item:
+				doStartZxSpectrum();
+				return true;
+				
+			case R.id.stop_item:
+				doStopZxSpectrum();
 				return true;
 				
 			default:
@@ -270,7 +288,7 @@ public class ZxSpectrumActivity2 extends Activity {
         super.onDestroy();
 		
 		mAudioTrackThread.interrupt();
-        stopZxSpectrum();
+        doStopZxSpectrum();
         try {
             mZxSpectrumThread.join();
         } catch (final InterruptedException e) {
@@ -285,6 +303,35 @@ public class ZxSpectrumActivity2 extends Activity {
 		mExceededInstructionsView.setVisibility(visibility);
 	}
 
+	private void doStartZxSpectrum() {
+		mZxSpectrumThread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					ZxSpectrumActivity2.this.runZxSpectrum();
+				}
+			});
+		mZxSpectrumThread.start();
+
+		mSoundThread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					ZxSpectrumActivity2.this.runSound();
+				}
+			});
+		mSoundThread.setPriority(Thread.MAX_PRIORITY);
+		mSoundThread.start();
+		
+		invalidateOptionsMenu();
+	}
+	
+	private void doStopZxSpectrum() {
+		stopZxSpectrum();
+		
+		invalidateOptionsMenu();
+	}
+	
 	@SuppressLint("StaticFieldLeak")
     private class LoadRomTask extends AsyncTask<String, Void, Void> {
 
@@ -309,24 +356,7 @@ public class ZxSpectrumActivity2 extends Activity {
 
         @Override
         protected void onPostExecute(final Void aVoid) {
-			mZxSpectrumThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					ZxSpectrumActivity2.this.runZxSpectrum();
-				}
-			});
-            mZxSpectrumThread.start();
-			
-			mSoundThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					ZxSpectrumActivity2.this.runSound();
-				}
-			});
-			mSoundThread.setPriority(Thread.MAX_PRIORITY);
-            mSoundThread.start();
+			doStartZxSpectrum();
 			
 			mAudioTrackThread = new Thread(new Runnable() {
 				

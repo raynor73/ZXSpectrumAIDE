@@ -13,4 +13,6 @@
 	
 	<string name="reset">Reset</string>
 	<string name="toggle_stats">Tiggle Stats</string>
+	<string name="start">Start</string>
+	<string name="stop">Stop</string>
 </resources>

@@ -58,6 +58,7 @@ void ZxSpectrum::soundLoop() {
 }
 
 void ZxSpectrum::loop() {
+	m_isRunning = true;
 	while (m_isRunning) {
 		const uint64_t startTstates = m_cpu->tStates();
 		clock_gettime(CLOCK_MONOTONIC, &m_startTimestamp);
@@ -103,7 +104,9 @@ void ZxSpectrum::reset() {
 }
 
 void ZxSpectrum::verticalRefresh() {
-	m_shouldInterrupt++;
+	if (m_isRunning) {
+		m_shouldInterrupt++;
+	}
 }
 
 uint32_t ZxSpectrum::interruptsCount() {
