@@ -10,4 +10,7 @@
     <string name="zx_reset">Reset</string>
     <string name="zx_caps">Caps</string>
     <string name="zx_symbol">SYM</string>
+	
+	<string name="reset">Reset</string>
+	<string name="toggle_stats">Tiggle Stats</string>
 </resources>

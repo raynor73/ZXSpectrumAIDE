@@ -94,6 +94,8 @@ public class ZxSpectrumActivity2 extends Activity {
 	
 	private final BlockingQueue<short[]> mSoundDataQueue = new LinkedBlockingQueue<>(1);
 
+	private boolean mShouldShowStats;
+	
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,18 +156,34 @@ public class ZxSpectrumActivity2 extends Activity {
                 onKeyReleased(Keyboard.KEY_CODE_SYMBOL);
             }
         });
-
-		findViewById(R.id.resetButton).setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View p1) {
-				resetZxSpectrum();
-			}
-		});
 		
         new LoadRomTask().execute("48.rom", logFile.getAbsolutePath());
     }
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.zx_spectrum_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.reset_item:
+				resetZxSpectrum();
+				return true;
+				
+			case R.id.toggle_stats_item:
+				mShouldShowStats = !mShouldShowStats;
+				updateStatsVisibility();
+				return true;
+				
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+	
     @Override
     protected void onResume() {
         super.onResume();
@@ -207,6 +225,8 @@ public class ZxSpectrumActivity2 extends Activity {
 			}
 		};
 		mScreenView.postDelayed(mUpdateStatsRoutine, 1000);
+		
+		updateStatsVisibility();
     }
 
     @Override
@@ -252,6 +272,13 @@ public class ZxSpectrumActivity2 extends Activity {
             Log.e(TAG, "Error stopping ZX Spectrum thread", e);
         }
     }
+	
+	private void updateStatsVisibility() {
+		int visibility = mShouldShowStats ? View.VISIBLE : View.GONE;
+		mInstructionsPerSecondView.setVisibility(visibility);
+		mInterruptsPerSecondView.setVisibility(visibility);
+		mExceededInstructionsView.setVisibility(visibility);
+	}
 
 	@SuppressLint("StaticFieldLeak")
     private class LoadRomTask extends AsyncTask<String, Void, Void> {
