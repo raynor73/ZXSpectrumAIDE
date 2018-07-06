@@ -17,8 +17,9 @@ void Beeper::loop() {
 		for (int i = 0; i < m_bufferSize; i++) {
 			clock_gettime(CLOCK_MONOTONIC, &m_startTimestamp);
 			
-			m_buffer[i] = (m_ioPorts[PORT_ADDRESS] & BEEPER_BIT_MASK) == 0 ? 0x8000 : 0x7fff;
-			
+			m_buffer[i] = (m_ioPorts[PORT_ADDRESS] & EAR_BIT_MASK) == 0 ? 0xc000 : 0x3fff;
+			m_buffer[i] += (m_ioPorts[PORT_ADDRESS] & MIC_BIT_MASK) == 0 ? 0xc000 : 0x3fff;
+
 			uint64_t actualTime;
 			do {
 				clock_gettime(CLOCK_MONOTONIC, &m_currentTimestamp);

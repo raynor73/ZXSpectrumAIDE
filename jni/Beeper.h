@@ -21,7 +21,8 @@ public:
 
 private:
 	static const int PORT_ADDRESS = 0xfe;
-	static const int BEEPER_BIT_MASK = 0x10;
+	static const int EAR_BIT_MASK = 0x10;
+	static const int MIC_BIT_MASK = 0x08;
 
 	int m_sampleRate;
 	int m_bufferSize;
