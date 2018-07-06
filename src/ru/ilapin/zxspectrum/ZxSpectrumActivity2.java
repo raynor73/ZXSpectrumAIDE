@@ -298,8 +298,8 @@ public class ZxSpectrumActivity2 extends Activity {
 			mAudioTrackThread = new Thread(new Runnable() {
 				
 				private final AudioTrack mAudioTrack;
-				/*private final short[] mSurrogateBuffer = new short[mBufferSize];
-				private short mLastSample;*/
+				private final short[] mSurrogateBuffer = new short[1];
+				private short mLastSample;
 					
 				{
 					mAudioTrack = new AudioTrack(
@@ -307,7 +307,7 @@ public class ZxSpectrumActivity2 extends Activity {
 						SAMPLE_RATE,
 						AudioFormat.CHANNEL_CONFIGURATION_MONO,
 						AudioFormat.ENCODING_PCM_16BIT, 
-						mBufferSize, 
+						mBufferSize * 2, 
 						AudioTrack.MODE_STREAM
 					);
 					mAudioTrack.play();
@@ -317,18 +317,19 @@ public class ZxSpectrumActivity2 extends Activity {
 				public void run() {
 					while (!mAudioTrackThread.isInterrupted()) {
 						short[] data;
-						/*data = mSoundDataQueue.poll();
+						data = mSoundDataQueue.poll();
 						if (data == null) {
 							data = mSurrogateBuffer;
-							Arrays.fill(data, mLastSample);
+							//Arrays.fill(data, mLastSample);
+							data[0] = mLastSample;
 						} else {
 							mLastSample = data[data.length - 1];
-						}*/
-						try {
+						}
+						/*try {
 							data = mSoundDataQueue.take();
 						} catch (InterruptedException e) {
 							throw new RuntimeException(e);
-						}
+						}*/
 						mAudioTrack.write(data, 0, data.length);
 					}
 					mAudioTrack.stop();
