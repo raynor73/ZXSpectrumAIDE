@@ -39,6 +39,7 @@ static ZxSpectrum *g_zxSpectrum = nullptr;
 //static bool g_isSoundDataQueueReferenceCreated = false;
 static jobject g_soundDataQueue;
 static jmethodID g_offerMethodId;
+static JNIEnv *g_soundEnv;
 	
 static const uint16_t BASE_ADDRESS = 0x4000;
 static const uint16_t SCREEN_WIDTH = 256;
@@ -93,6 +94,29 @@ static void renderZxSpectrumScreen(const uint8_t* memory, uint32_t* bitmap, cons
 			bitmap[x + y * SCREEN_WIDTH] = color;
 		}
 	}
+}
+
+static void soundCallback(int16_t* data, int size) {
+	jshortArray javaData;
+	javaData = g_soundEnv->NewShortArray(size);
+	
+	/*if (result == NULL) {
+		return NULL; // out of memory error thrown 
+	}
+	int i;
+	// fill a temp structure to use to populate the java int array
+	jint fill[size];
+	for (i = 0; i < size; i++) {
+		fill[i] = 0; // put whatever logic you want to populate the values here.
+	}*/
+	
+	// move from the temp structure to the java structure
+	g_soundEnv->SetShortArrayRegion(javaData, 0, size, data);
+	
+	g_soundEnv->CallBooleanMethod(g_soundDataQueue, g_offerMethodId, javaData);
+	g_soundEnv->DeleteLocalRef(javaData);
+	
+	//return result;
 }
 
 jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
@@ -183,7 +207,7 @@ JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getZxSpectr
 	env->ReleaseIntArrayElements(outData_, outData, 0);
 }
 
-JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpectrum(JNIEnv *env, jobject instance, jbyteArray program_, jobject queue, jstring logFilePath_) {
+JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpectrum(JNIEnv *env, jobject instance, jbyteArray program_, jint sampleRate, jint bufferSize, jobject queue, jstring logFilePath_) {
 	g_soundDataQueue = env->NewGlobalRef(queue);
 	jclass queueClass = env->GetObjectClass(g_soundDataQueue);
 	g_offerMethodId = env->GetMethodID(queueClass, "offer", "(Ljava/lang/Object;)Z");
@@ -192,7 +216,7 @@ JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpect
 	jbyte *program = env->GetByteArrayElements(program_, NULL);
 	const char *logFilePath = env->GetStringUTFChars(logFilePath_, 0);
 
-	g_zxSpectrum = new ZxSpectrum(std::string(logFilePath));
+	g_zxSpectrum = new ZxSpectrum(sampleRate, bufferSize, soundCallback, std::string(logFilePath));
 
 	g_zxSpectrum->reset();
 	std::memcpy(g_zxSpectrum->memoryArray(), program, size_t(env->GetArrayLength(program_)));
@@ -209,6 +233,21 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_runZxSpectrum(JNIEnv *env, jobject
 
 	try {
 		g_zxSpectrum->loop();
+	} catch (std::exception &e) {
+		__android_log_print(ANDROID_LOG_DEBUG, "ZX Spectrum", "Exception: %s", e.what());
+	}
+}
+
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_runSound(JNIEnv *env, jobject instance) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	g_soundEnv = env;
+	
+	try {
+		g_zxSpectrum->soundLoop();
 	} catch (std::exception &e) {
 		__android_log_print(ANDROID_LOG_DEBUG, "ZX Spectrum", "Exception: %s", e.what());
 	}

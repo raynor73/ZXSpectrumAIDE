@@ -20,11 +20,15 @@ import android.app.*;
 import android.view.View.*;
 import android.view.*;
 import java.util.concurrent.*;
+import android.media.*;
+import java.util.*;
 
 public class ZxSpectrumActivity2 extends Activity {
 
     private static final String TAG = "ZxSpectrumActivity2";
-
+	
+	private static final int SAMPLE_RATE = 44100;
+	
     private final Map<Integer, Integer> mKeyCodesMap = new HashMap<Integer, Integer>(){{
         put(KeyEvent.KEYCODE_0, Keyboard.KEY_CODE_0);
         put(KeyEvent.KEYCODE_1, Keyboard.KEY_CODE_1);
@@ -83,7 +87,10 @@ public class ZxSpectrumActivity2 extends Activity {
 
     private Thread mZxSpectrumThread;
 	private Thread mSoundThread;
+	private Thread mAudioTrackThread;
     private Runnable mUpdateStatsRoutine;
+	
+	private int mBufferSize;
 	
 	private final BlockingQueue<short[]> mSoundDataQueue = new LinkedBlockingQueue<>(1);
 
@@ -92,6 +99,8 @@ public class ZxSpectrumActivity2 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zx_spectrum2);
 
+		mBufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
+		
 		mScreenView = findViewById(R.id.zx_spectrum_screen);
 		mInstructionsPerSecondView = findViewById(R.id.ips);
 		mInterruptsPerSecondView = findViewById(R.id.interruptsPerSecond);
@@ -234,9 +243,8 @@ public class ZxSpectrumActivity2 extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-		stopSound();
 		
+		mAudioTrackThread.interrupt();
         stopZxSpectrum();
         try {
             mZxSpectrumThread.join();
@@ -257,7 +265,7 @@ public class ZxSpectrumActivity2 extends Activity {
                 final int bytesRead = is.read(buffer);
                 final byte[] program = new byte[bytesRead];
                 System.arraycopy(buffer, 0, program, 0, bytesRead);
-                initZxSpectrum(program, mSoundDataQueue, params[1]);
+                initZxSpectrum(program, SAMPLE_RATE, mBufferSize, mSoundDataQueue, params[1]);
 
                 is.close();
             } catch (final IOException e) {
@@ -280,21 +288,56 @@ public class ZxSpectrumActivity2 extends Activity {
 			
 			mSoundThread = new Thread(new Runnable() {
 
-					@Override
-					public void run() {
-						ZxSpectrumActivity2.this.runSound();
-					}
-				});
+				@Override
+				public void run() {
+					ZxSpectrumActivity2.this.runSound();
+				}
+			});
             mSoundThread.start();
+			
+			mAudioTrackThread = new Thread(new Runnable() {
+				
+				private final AudioTrack mAudioTrack;
+				private final short[] mSurrogateBuffer = new short[mBufferSize];
+				private short mLastSample;
+					
+				{
+					mAudioTrack = new AudioTrack(
+						AudioManager.STREAM_MUSIC,
+						SAMPLE_RATE,
+						AudioFormat.CHANNEL_CONFIGURATION_MONO,
+						AudioFormat.ENCODING_PCM_16BIT, 
+						mBufferSize, 
+						AudioTrack.MODE_STREAM
+					);
+					mAudioTrack.play();
+				}
+				
+				@Override
+				public void run() {
+					while (!mAudioTrackThread.isInterrupted()) {
+						short[] data;
+						data = mSoundDataQueue.poll();
+						if (data == null) {
+							data = mSurrogateBuffer;
+							Arrays.fill(data, mLastSample);
+						} else {
+							mLastSample = data[data.length - 1];
+						}
+						mAudioTrack.write(data, 0, data.length);
+					}
+					mAudioTrack.stop();
+				}
+			});
+            mAudioTrackThread.start();
 		}
     }
 
-    private native void initZxSpectrum(byte[] program, BlockingQueue<short[]> queue, String logFilePath);
+    private native void initZxSpectrum(byte[] program, int sampleRate, int bufferSize, BlockingQueue<short[]> queue, String logFilePath);
     private native void runZxSpectrum();
     private native void stopZxSpectrum();
     private native void resetZxSpectrum();
 	private native void runSound();
-	private native void stopSound();
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
     private native void onVerticalRefresh();
     private native void onKeyPressed(int keyCode);

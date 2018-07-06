@@ -27,10 +27,10 @@ static uint8_t readFromPort(void* userData, uint16_t port) {
 
 static void writeToPort(void* userData, uint16_t port, uint8_t data) {
 	uint8_t* io = static_cast<uint8_t *>(userData);
-	io[port] = data;
+	io[port & 0x00ff] = data;
 }
 
-ZxSpectrum::ZxSpectrum(std::string logFilePath) :
+ZxSpectrum::ZxSpectrum(int sampleRate, int bufferSize, BeeperCallback beeperCallback, std::string logFilePath) :
 		m_isRunning(true),
         m_shouldInterrupt(0),
 //		m_prevTstates(0),
@@ -39,6 +39,7 @@ ZxSpectrum::ZxSpectrum(std::string logFilePath) :
 		m_interruptsCount(0)
 {
 	m_keyboard = new Keyboard(m_portsArray);
+	m_beeper = new Beeper(m_portsArray, sampleRate, bufferSize, beeperCallback);
 	m_cpu = new Z80(readFromMemory, writeToMemory, readFromPort, writeToPort);
 	m_cpu->setMemoryUserData(m_memoryArray);
 	m_cpu->setIoUserData(m_portsArray);
@@ -48,7 +49,12 @@ ZxSpectrum::ZxSpectrum(std::string logFilePath) :
 
 ZxSpectrum::~ZxSpectrum() {
 	delete m_cpu;
+	delete m_beeper;
 	delete m_keyboard;
+}
+
+void ZxSpectrum::soundLoop() {
+	m_beeper->loop();
 }
 
 void ZxSpectrum::loop() {
@@ -88,6 +94,7 @@ void ZxSpectrum::loop() {
 }
 
 void ZxSpectrum::quit() {
+	m_beeper->stop();
 	m_isRunning = false;
 }
 

@@ -18,7 +18,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cpp .cc
 LOCAL_MODULE    := hello-jni
-LOCAL_SRC_FILES := hello-jni.cpp z80/Z80.cpp Z80Exerciser.cpp ZxSpectrum.cpp Keyboard.cpp
+LOCAL_SRC_FILES := hello-jni.cpp z80/Z80.cpp Z80Exerciser.cpp ZxSpectrum.cpp Keyboard.cpp Beeper.cpp
 
 LOCAL_CPP_FEATURES := exceptions
 

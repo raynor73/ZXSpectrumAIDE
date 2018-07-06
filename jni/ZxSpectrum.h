@@ -10,13 +10,15 @@
 #include <ctime>
 #include "z80/Z80.h"
 #include "Keyboard.h"
+#include "Beeper.h"
 
 class ZxSpectrum {
 public:
-	ZxSpectrum(std::string logFilePath);
+	ZxSpectrum(int sampleRate, int bufferSize, BeeperCallback beeperCallback, std::string logFilePath);
 	~ZxSpectrum();
 
 	void loop();
+	void soundLoop();
 	void verticalRefresh();
 	void quit();
 	void reset();
@@ -43,7 +45,8 @@ private:
 
 	uint8_t m_memoryArray[0x10000];
 	uint8_t m_portsArray[0x10000];
-	Keyboard *m_keyboard;
+	Keyboard* m_keyboard;
+	Beeper* m_beeper;
 	std::atomic<bool> m_isRunning;
 	std::atomic<uint32_t> m_shouldInterrupt;
 	uint64_t m_totalInstructionsCounter;
