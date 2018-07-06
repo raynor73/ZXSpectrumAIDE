@@ -19,6 +19,7 @@ import ru.ilapin.common.android.widgets.PressReleaseButton;
 import android.app.*;
 import android.view.View.*;
 import android.view.*;
+import java.util.concurrent.*;
 
 public class ZxSpectrumActivity2 extends Activity {
 
@@ -81,7 +82,10 @@ public class ZxSpectrumActivity2 extends Activity {
     private final int[] mScreenData = new int[ZxSpectrumView2.SCREEN_WIDTH * ZxSpectrumView2.SCREEN_HEIGHT * 4];
 
     private Thread mZxSpectrumThread;
+	private Thread mSoundThread;
     private Runnable mUpdateStatsRoutine;
+	
+	private final BlockingQueue<short[]> mSoundDataQueue = new LinkedBlockingQueue<>(1);
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -231,6 +235,8 @@ public class ZxSpectrumActivity2 extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
+		stopSound();
+		
         stopZxSpectrum();
         try {
             mZxSpectrumThread.join();
@@ -251,7 +257,7 @@ public class ZxSpectrumActivity2 extends Activity {
                 final int bytesRead = is.read(buffer);
                 final byte[] program = new byte[bytesRead];
                 System.arraycopy(buffer, 0, program, 0, bytesRead);
-                initZxSpectrum(program, params[1]);
+                initZxSpectrum(program, mSoundDataQueue, params[1]);
 
                 is.close();
             } catch (final IOException e) {
@@ -271,21 +277,28 @@ public class ZxSpectrumActivity2 extends Activity {
 				}
 			});
             mZxSpectrumThread.start();
+			
+			mSoundThread = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						ZxSpectrumActivity2.this.runSound();
+					}
+				});
+            mSoundThread.start();
 		}
     }
 
-    /*private native void nativeGetScreenData(final byte[] memory, final int[] outData, boolean isFlash);
-    private native void runNativeThread();*/
-
-    private native void initZxSpectrum(byte[] program, String logFilePath);
+    private native void initZxSpectrum(byte[] program, BlockingQueue<short[]> queue, String logFilePath);
     private native void runZxSpectrum();
     private native void stopZxSpectrum();
     private native void resetZxSpectrum();
+	private native void runSound();
+	private native void stopSound();
     private native void getZxSpectrumScreen(int[] outData, boolean isFlash);
     private native void onVerticalRefresh();
     private native void onKeyPressed(int keyCode);
     private native void onKeyReleased(int keyCode);
-    //private native void writeToPort(int port, byte value);
     private native float getExceededInstructionsPercent();
     private native int getInterruptCount();
     private native int getInstructionsCount();

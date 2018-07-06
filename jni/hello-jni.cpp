@@ -35,6 +35,10 @@ extern "C"
 
 static Z80Exerciser* g_z80Exerciser;
 static ZxSpectrum *g_zxSpectrum = nullptr;
+
+//static bool g_isSoundDataQueueReferenceCreated = false;
+static jobject g_soundDataQueue;
+static jmethodID g_offerMethodId;
 	
 static const uint16_t BASE_ADDRESS = 0x4000;
 static const uint16_t SCREEN_WIDTH = 256;
@@ -179,7 +183,12 @@ JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_getZxSpectr
 	env->ReleaseIntArrayElements(outData_, outData, 0);
 }
 
-JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpectrum(JNIEnv *env, jobject instance, jbyteArray program_, jstring logFilePath_) {
+JNIEXPORT void JNICALL Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_initZxSpectrum(JNIEnv *env, jobject instance, jbyteArray program_, jobject queue, jstring logFilePath_) {
+	g_soundDataQueue = env->NewGlobalRef(queue);
+	jclass queueClass = env->GetObjectClass(g_soundDataQueue);
+	g_offerMethodId = env->GetMethodID(queueClass, "offer", "(Ljava/lang/Object;)Z");
+	env->DeleteLocalRef(queueClass);
+	
 	jbyte *program = env->GetByteArrayElements(program_, NULL);
 	const char *logFilePath = env->GetStringUTFChars(logFilePath_, 0);
 
