@@ -1714,6 +1714,13 @@ void Z80::doExecute() {
 			m_PC += 1;
 			break;
 
+		case 0xf7:
+			LOG_OPCODE("RST 0x30");
+			doPush(m_PC);
+			m_PC = 0x30;
+			m_tStates += 1;
+			break;
+			
 		case 0xf8:
 			LOG_OPCODE("RET S");
 			if (isFlagSet(FLAG_S_MASK)) {
