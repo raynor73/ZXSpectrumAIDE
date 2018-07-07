@@ -336,4 +336,31 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_stopZxSpectrum(JNIEnv *env, jobjec
 	g_zxSpectrum->quit();
 }
 
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_saveZxSpectrumState(JNIEnv *env, jobject instance, jobject os) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+	jclass osClass = env->GetObjectClass(os);
+	jmethodID writeShortMethodId = env->GetMethodID(osClass, "writeShort", "(I)V");
+	jmethodID writeLongMethodId = env->GetMethodID(osClass, "writeLong", "(J)V");
+	jmethodID writeByteMethodId = env->GetMethodID(osClass, "writeByte", "(I)V");
+	jmethodID writeBooleanMethodId = env->GetMethodID(osClass, "writeBoolean", "(Z)V");
+	env->DeleteLocalRef(osClass);
+	
+	Z80State cpuState = g_zxSpectrum->cpuState();
+	__android_log_print(ANDROID_LOG_DEBUG, "ZX Spectrum", "PC: %d", cpuState.regPC());
+	
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regPC());
+}
+
+JNIEXPORT void JNICALL
+Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_restoreZxSpectrumState(JNIEnv *env, jobject instance, jobject is) {
+	if (g_zxSpectrum == nullptr) {
+		return;
+	}
+
+}
+
 }

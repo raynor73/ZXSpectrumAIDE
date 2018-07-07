@@ -5143,3 +5143,82 @@ uint8_t Z80::doSetRes(bool isSet, int pos, uint8_t value) {
 
 	return value;
 }
+
+Z80State Z80::state() const {
+	Z80State state;
+	
+	state.setRegPC(m_PC);
+	
+	state.setRegAF(m_AF);
+	state.setRegBC(m_BC);
+	state.setRegDE(m_DE);
+	state.setRegHL(m_HL);
+	state.setRegIX(m_IX);
+	state.setRegIY(m_IY);
+	state.setRegSP(m_SP);
+	
+	state.setRegAFalt(m_AFalt);
+	state.setRegBCalt(m_BCalt);
+	state.setRegDEalt(m_DEalt);
+	state.setRegHLalt(m_HLalt);
+	state.setRegIXalt(m_IXalt);
+	state.setRegIYalt(m_IYalt);
+	state.setRegSPalt(m_SPalt);
+	
+	state.setI(m_I);
+	state.setR(m_R);
+	
+	state.setTstates(m_tStates);
+	
+	state.setIsHalted(m_isHalted);
+	state.setIsUndefinedState(m_isUndefinedState);
+	
+	state.setIFF1(m_IFF1);
+	state.setIFF2(m_IFF2);
+	state.setIM(m_IM);
+	state.setIsNmiRequested(m_isNmiRequested);
+	state.setIsIntRequested(m_isIntRequested);
+	state.setShouldDeferInt(m_shouldDeferInt);
+	state.setIntVector(m_intVector);
+	state.setShouldExecuteIntVector(m_shouldExecuteIntVector);
+	
+	return state;
+}
+
+void Z80::setState(Z80State state) {
+	m_PC = state.regPC();
+	
+	m_AF = state.regAF();
+	m_BC = state.regBC();
+	m_DE = state.regDE();
+	m_HL = state.regHL();
+	m_IX = state.regIX();
+	m_IY = state.regIY();
+	m_SP = state.regSP();
+	
+	m_AFalt = state.regAFalt();
+	m_BCalt = state.regBCalt();
+	m_DEalt = state.regDEalt();
+	m_HLalt = state.regHLalt();
+	m_IXalt = state.regIXalt();
+	m_IYalt = state.regIYalt();
+	m_SPalt = state.regSPalt();
+	
+	m_I = state.regI();
+	m_R = state.regR();
+	
+	m_tStates = state.tStates();
+	
+	m_isHalted = state.isHalted();
+	m_isUndefinedState = state.isUndefinedState();
+
+	m_IFF1 = state.IFF1();
+	m_IFF2 = state.IFF2();
+	m_IM = state.IM();
+	m_isNmiRequested = state.isNmiRequested();
+	m_isIntRequested = state.isIntRequested();
+	m_shouldDeferInt = state.shouldDeferInt();
+	m_intVector = state.intVector();
+	m_shouldExecuteIntVector = state.shouldExecuteIntVector();
+}
+

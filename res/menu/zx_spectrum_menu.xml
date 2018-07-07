@@ -16,5 +16,13 @@
 	<item
         android:id="@+id/stop_item"
         android:title="@string/stop"/>
+	
+	<item
+        android:id="@+id/save_item"
+        android:title="@string/save"/>
+	
+	<item
+        android:id="@+id/restore_item"
+        android:title="@string/restore"/>
     
 </menu>

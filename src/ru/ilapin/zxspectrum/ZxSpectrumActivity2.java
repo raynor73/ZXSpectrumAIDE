@@ -22,6 +22,8 @@ import android.view.*;
 import java.util.concurrent.*;
 import android.media.*;
 import java.util.*;
+import java.io.*;
+import java.text.*;
 
 public class ZxSpectrumActivity2 extends Activity {
 
@@ -75,6 +77,8 @@ public class ZxSpectrumActivity2 extends Activity {
     static {
         System.loadLibrary("hello-jni");
     }
+	
+	private final SimpleDateFormat mSaveFilenameFormat = new SimpleDateFormat("'zx48k'_ddMMyyyy_HHmmss.'raw'");
 
     ZxSpectrumView2 mScreenView;
     TextView mInstructionsPerSecondView;
@@ -178,6 +182,8 @@ public class ZxSpectrumActivity2 extends Activity {
 		
 		menu.findItem(R.id.start_item).setVisible(!zxSpectrumIsRunning);
 		menu.findItem(R.id.stop_item).setVisible(zxSpectrumIsRunning);
+		menu.findItem(R.id.save_item).setVisible(!zxSpectrumIsRunning);
+		menu.findItem(R.id.restore_item).setVisible(!zxSpectrumIsRunning);
 		
 		return true;
 	}
@@ -200,6 +206,14 @@ public class ZxSpectrumActivity2 extends Activity {
 				
 			case R.id.stop_item:
 				doStopZxSpectrum();
+				return true;
+				
+			case R.id.save_item:
+				doSaveZxSpectrum();
+				return true;
+				
+			case R.id.restore_item:
+				doRestoreZxSpectrum();
 				return true;
 				
 			default:
@@ -295,6 +309,33 @@ public class ZxSpectrumActivity2 extends Activity {
             Log.e(TAG, "Error stopping ZX Spectrum thread", e);
         }
     }
+	
+	private void doSaveZxSpectrum() {
+		final String saveFilename = mSaveFilenameFormat.format(new Date());
+		final File saveFile = new File(
+			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
+			saveFilename
+		);
+		final DataOutputStream os;
+		try {
+			os = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(saveFile)));
+		} catch (FileNotFoundException e) {
+			//Log.e(TAG, "Can't save state", e);
+			throw new RuntimeException(e);
+		}
+		
+		saveZxSpectrumState(os);
+		
+		try {
+			os.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void doRestoreZxSpectrum() {
+		
+	}
 	
 	private void updateStatsVisibility() {
 		int visibility = mShouldShowStats ? View.VISIBLE : View.GONE;
@@ -416,4 +457,6 @@ public class ZxSpectrumActivity2 extends Activity {
     private native float getExceededInstructionsPercent();
     private native int getInterruptCount();
     private native int getInstructionsCount();
+	private native void saveZxSpectrumState(DataOutputStream os);
+	private native void restoreZxSpectrumState(DataInputStream is);
 }

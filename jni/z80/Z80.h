@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <fstream>
+#include "Z80State.h"
 
 typedef uint8_t (*Z80ReadData)(void *userData, uint16_t address);
 typedef void (*Z80WriteData)(void *userData, uint16_t address, uint8_t data);
@@ -55,6 +56,9 @@ public:
 
 	uint64_t tStates() const { return m_tStates; }
 
+	Z80State state() const;
+	void setState(Z80State state);
+	
 	void setLogStream(std::fstream* logStream) { m_logStream = logStream; }
 
 private:
