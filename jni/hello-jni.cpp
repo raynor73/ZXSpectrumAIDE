@@ -347,12 +347,60 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_saveZxSpectrumState(JNIEnv *env, j
 	jmethodID writeLongMethodId = env->GetMethodID(osClass, "writeLong", "(J)V");
 	jmethodID writeByteMethodId = env->GetMethodID(osClass, "writeByte", "(I)V");
 	jmethodID writeBooleanMethodId = env->GetMethodID(osClass, "writeBoolean", "(Z)V");
+	jmethodID writeByteArrayMethodId = env->GetMethodID(osClass, "write", "([BII)V");
 	env->DeleteLocalRef(osClass);
 	
 	Z80State cpuState = g_zxSpectrum->cpuState();
-	__android_log_print(ANDROID_LOG_DEBUG, "ZX Spectrum", "PC: %d", cpuState.regPC());
+	
+	jbyteArray ram = env->NewByteArray(0x10000);
+	env->SetByteArrayRegion(ram, 0, 0x10000, (const jbyte*) g_zxSpectrum->memoryArray());
+	
+	jbyteArray ports = env->NewByteArray(0x10000);
+	env->SetByteArrayRegion(ports, 0, 0x10000, (const jbyte*) g_zxSpectrum->portsArray());
+
+	//__android_log_print(ANDROID_LOG_DEBUG, "ZX Spectrum", "PC: %d", cpuState.regPC());
 	
 	env->CallVoidMethod(os, writeShortMethodId, cpuState.regPC());
+	
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regAF());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regBC());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regDE());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regHL());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regIX());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regIY());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regSP());
+	
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regAFalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regBCalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regDEalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regHLalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regIXalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regIYalt());
+	env->CallVoidMethod(os, writeShortMethodId, cpuState.regSPalt());
+	
+	env->CallVoidMethod(os, writeByteMethodId, cpuState.regI());
+	env->CallVoidMethod(os, writeByteMethodId, cpuState.regR());
+
+	env->CallVoidMethod(os, writeLongMethodId, cpuState.tStates());
+	
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.isHalted());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.isUndefinedState());
+
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.IFF1());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.IFF2());
+
+	env->CallVoidMethod(os, writeByteMethodId, cpuState.IM());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.isNmiRequested());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.isIntRequested());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.shouldDeferInt());
+	env->CallVoidMethod(os, writeByteMethodId, cpuState.intVector());
+	env->CallVoidMethod(os, writeBooleanMethodId, cpuState.shouldExecuteIntVector());
+	
+	env->CallVoidMethod(os, writeByteArrayMethodId, ram, 0, 0x10000);
+	env->CallVoidMethod(os, writeByteArrayMethodId, ports, 0, 0x10000);
+	
+	env->DeleteLocalRef(ram);
+	env->DeleteLocalRef(ports);
 }
 
 JNIEXPORT void JNICALL
@@ -361,6 +409,68 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_restoreZxSpectrumState(JNIEnv *env
 		return;
 	}
 
+	jclass isClass = env->GetObjectClass(is);
+	jmethodID readShortMethodId = env->GetMethodID(isClass, "readShort", "()S");
+	jmethodID readLongMethodId = env->GetMethodID(isClass, "readLong", "()J");
+	jmethodID readByteMethodId = env->GetMethodID(isClass, "readByte", "()B");
+	jmethodID readBooleanMethodId = env->GetMethodID(isClass, "readBoolean", "()Z");
+	jmethodID readByteArrayMethodId = env->GetMethodID(isClass, "read", "([BII)I");
+	env->DeleteLocalRef(isClass);
+	
+	Z80State cpuState;
+	
+	cpuState.setRegPC(env->CallShortMethod(is, readShortMethodId));
+	
+	cpuState.setRegAF(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegBC(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegDE(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegHL(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegIX(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegIY(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegSP(env->CallShortMethod(is, readShortMethodId));
+	
+	cpuState.setRegAFalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegBCalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegDEalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegHLalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegIXalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegIYalt(env->CallShortMethod(is, readShortMethodId));
+	cpuState.setRegSPalt(env->CallShortMethod(is, readShortMethodId));
+	
+	cpuState.setI(env->CallByteMethod(is, readByteMethodId));
+	cpuState.setR(env->CallByteMethod(is, readByteMethodId));
+	
+	cpuState.setTstates(env->CallLongMethod(is, readLongMethodId));
+	
+	cpuState.setIsHalted(env->CallBooleanMethod(is, readBooleanMethodId));
+	cpuState.setIsUndefinedState(env->CallBooleanMethod(is, readBooleanMethodId));
+	
+	cpuState.setIFF1(env->CallBooleanMethod(is, readBooleanMethodId));
+	cpuState.setIFF2(env->CallBooleanMethod(is, readBooleanMethodId));
+	
+	cpuState.setIM(env->CallByteMethod(is, readByteMethodId));
+
+	cpuState.setIsNmiRequested(env->CallBooleanMethod(is, readBooleanMethodId));
+	cpuState.setIsIntRequested(env->CallBooleanMethod(is, readBooleanMethodId));
+	cpuState.setShouldDeferInt(env->CallBooleanMethod(is, readBooleanMethodId));
+	cpuState.setIntVector(env->CallByteMethod(is, readByteMethodId));
+	cpuState.setShouldExecuteIntVector(env->CallBooleanMethod(is, readBooleanMethodId));
+	
+	g_zxSpectrum->setCpuState(cpuState);
+	
+	jbyteArray ram = env->NewByteArray(0x10000);
+	env->CallVoidMethod(is, readByteArrayMethodId, ram, 0, 0x10000);
+	jbyte *ramArray = env->GetByteArrayElements(ram, NULL);
+	std::memcpy(g_zxSpectrum->memoryArray(), ramArray, 0x10000);
+	env->ReleaseByteArrayElements(ram, ramArray, 0);
+	env->DeleteLocalRef(ram);
+	
+	jbyteArray ports = env->NewByteArray(0x10000);
+	env->CallVoidMethod(is, readByteArrayMethodId, ports, 0, 0x10000);
+	jbyte *portsArray = env->GetByteArrayElements(ports, NULL);
+	std::memcpy(g_zxSpectrum->portsArray(), portsArray, 0x10000);
+	env->ReleaseByteArrayElements(ports, portsArray, 0);
+	env->DeleteLocalRef(ports);
 }
 
 }

@@ -35,6 +35,7 @@ public:
 	uint8_t* memoryArray() { return m_memoryArray; }
 	uint8_t* portsArray() { return m_portsArray; }
 	Z80State cpuState() const { return m_cpu->state(); }
+	void setCpuState(Z80State state) { m_cpu->setState(state); }
 
 	void onKeyPressed(const int keyCode);
 	void onKeyReleased(const int keyCode);

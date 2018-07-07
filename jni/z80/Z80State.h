@@ -35,6 +35,7 @@ public:
 	
 	bool isHalted() const { return m_isHalted; }
 	bool isUndefinedState() const { return m_isUndefinedState; }
+	
 	bool IFF1() const { return m_IFF1; }
 	bool IFF2() const { return m_IFF2; }
 	uint8_t IM() const { return m_IM; }
