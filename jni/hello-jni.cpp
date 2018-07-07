@@ -459,14 +459,14 @@ Java_ru_ilapin_zxspectrum_ZxSpectrumActivity2_restoreZxSpectrumState(JNIEnv *env
 	g_zxSpectrum->setCpuState(cpuState);
 	
 	jbyteArray ram = env->NewByteArray(0x10000);
-	env->CallVoidMethod(is, readByteArrayMethodId, ram, 0, 0x10000);
+	env->CallIntMethod(is, readByteArrayMethodId, ram, 0, 0x10000);
 	jbyte *ramArray = env->GetByteArrayElements(ram, NULL);
 	std::memcpy(g_zxSpectrum->memoryArray(), ramArray, 0x10000);
 	env->ReleaseByteArrayElements(ram, ramArray, 0);
 	env->DeleteLocalRef(ram);
 	
 	jbyteArray ports = env->NewByteArray(0x10000);
-	env->CallVoidMethod(is, readByteArrayMethodId, ports, 0, 0x10000);
+	env->CallIntMethod(is, readByteArrayMethodId, ports, 0, 0x10000);
 	jbyte *portsArray = env->GetByteArrayElements(ports, NULL);
 	std::memcpy(g_zxSpectrum->portsArray(), portsArray, 0x10000);
 	env->ReleaseByteArrayElements(ports, portsArray, 0);

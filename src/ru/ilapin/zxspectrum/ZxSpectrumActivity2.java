@@ -24,12 +24,18 @@ import android.media.*;
 import java.util.*;
 import java.io.*;
 import java.text.*;
+import android.content.*;
+import android.widget.*;
+import android.net.*;
+import android.database.*;
+import java.net.*;
 
 public class ZxSpectrumActivity2 extends Activity {
 
     private static final String TAG = "ZxSpectrumActivity2";
 	
 	private static final int SAMPLE_RATE = 44100;
+	private static final int FILE_SELECT_CODE = 123;
 	
     private final Map<Integer, Integer> mKeyCodesMap = new HashMap<Integer, Integer>(){{
         put(KeyEvent.KEYCODE_0, Keyboard.KEY_CODE_0);
@@ -296,7 +302,60 @@ public class ZxSpectrumActivity2 extends Activity {
 
         mScreenView.removeCallbacks(mUpdateStatsRoutine);
     }
+	
+	private static String getPath(Context context, Uri uri) throws URISyntaxException {
+		if ("content".equalsIgnoreCase(uri.getScheme())) {
+			String[] projection = { "_data" };
+			Cursor cursor = null;
 
+			try {
+				cursor = context.getContentResolver().query(uri, projection, null, null, null);
+				int column_index = cursor.getColumnIndexOrThrow("_data");
+				if (cursor.moveToFirst()) {
+					return cursor.getString(column_index);
+				}
+			} catch (Exception e) {
+				// Eat it
+			}
+		}
+		else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			return uri.getPath();
+		}
+
+		return null;
+	} 
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case FILE_SELECT_CODE:
+				if (resultCode == RESULT_OK) {
+					File saveFile;
+					try {
+						saveFile = new File(ZxSpectrumActivity2.getPath(this, data.getData()));
+					} catch (URISyntaxException e) {
+						throw new RuntimeException(e);
+					}
+					DataInputStream is;
+					try {
+						is = new DataInputStream(new BufferedInputStream(new FileInputStream(saveFile)));
+					} catch (FileNotFoundException e) {
+						throw new RuntimeException(e);
+					}
+					restoreZxSpectrumState(is);
+					try {
+						is.close();
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				break;
+				
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+	
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -334,7 +393,19 @@ public class ZxSpectrumActivity2 extends Activity {
 	}
 
 	private void doRestoreZxSpectrum() {
-		
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT); 
+		intent.setType("*/*"); 
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+		try {
+			startActivityForResult(
+                Intent.createChooser(intent, "Select saved state"),
+                FILE_SELECT_CODE
+			);
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(this, "Please install a File Manager", 
+						   Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	private void updateStatsVisibility() {
