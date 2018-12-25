@@ -172,7 +172,7 @@ public class ZxSpectrumActivity2 extends Activity {
             }
         });
 		
-        new LoadRomTask().execute("48.rom", logFile.getAbsolutePath());
+        new LoadRomTask().execute("48.rom"/*"jetpac.z80"*/, logFile.getAbsolutePath());
     }
 
 	@Override
